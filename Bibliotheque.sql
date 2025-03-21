@@ -1,0 +1,18 @@
+DROP DATABASE IF EXISTS Bibliotheque;
+CREATE DATABASE Bibliotheque;
+USE Bibliotheque;
+
+DROP TABLE IF EXISTS Utilisateur;
+DROP TABLE IF EXISTS Salle;
+DROP TABLE IF EXISTS Place;
+DROP TABLE IF EXISTS Livre;
+
+
+CREATE TABLE Utilisateur(
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nom VARCHAR(50),
+  prenom VARCHAR(50),
+	type VARCHAR(50);
+)
+
+ 
