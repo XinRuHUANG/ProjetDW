@@ -90,6 +90,41 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     </form>
   </div>
 </div>
+                        {isMenuOpen && (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+        <div 
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={() => setIsMenuOpen(false)}
+        ></div>
+        
+        <div className="absolute inset-y-0 right-0 max-w-full flex">
+            <div className="relative w-screen max-w-xs">
+                <div className="h-full bg-white dark:bg-zinc-900 shadow-xl">
+                    <div className="p-4 border-b dark:border-zinc-700">
+                        <h2 className="text-lg font-medium">Menu</h2>
+                    </div>
+                    
+                    <div className="p-4">
+                        <Link 
+                            href={route('favorites')} 
+                            className="block py-2 hover:text-[#FF2D20]"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Mes favoris
+                        </Link>
+                        <Link 
+                            href={route('settings')} 
+                            className="block py-2 hover:text-[#FF2D20]"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Paramètres
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+)}
                         
                         
 
