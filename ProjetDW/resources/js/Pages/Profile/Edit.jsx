@@ -34,6 +34,23 @@ export default function Edit({ mustVerifyEmail, status }) {
                     </div>
                 </div>
             </div>
+
+            <div>
+                <h2>Mes favoris</h2>
+
+                {/* Vérifier si l'utilisateur a des favoris */}
+                {user.favorites.length === 0 ? (
+                    <p>Aucun livre dans vos favoris pour le moment.</p>
+                ) : (
+                    <ul>
+                        {user.favorites.map((favorite) => (
+                        <li key={favorite.id}>
+                            <strong>{favorite.title}</strong> par {favorite.author} (publiée en {favorite.yearPublished})
+                        </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
         </AuthenticatedLayout>
     );
 }

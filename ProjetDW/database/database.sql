@@ -1,209 +1,167 @@
--- MySQL dump 10.13  Distrib 8.0.41, for Linux (x86_64)
---
--- Host: localhost    Database: bibliotheque
--- ------------------------------------------------------
--- Server version	8.0.41-0ubuntu0.24.04.1
+-- Uniformiser le nommage (toutes les tables au pluriel)
+DROP TABLE IF EXISTS `books`, `computers`, `tablets`, `seats`, `rooms`, `users`, `favorites`;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+-- Normaliser les catégories de livres dans une table séparée
+CREATE TABLE `book_categories` (
+  `idCategory` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(50) NOT NULL,
+  `description` TEXT DEFAULT NULL,
+  PRIMARY KEY (`idCategory`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Table structure for table `Livre`
---
+-- Ajouter une table pour les types d'utilisateurs
+CREATE TABLE `user_types` (
+  `idUserType` INT NOT NULL AUTO_INCREMENT,
+  `typeName` VARCHAR(20) NOT NULL,
+  `description` TEXT DEFAULT NULL,
+  `maxBorrowLimit` INT DEFAULT 5,
+  PRIMARY KEY (`idUserType`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `Livre`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Livre` (
-  `idLivre` int NOT NULL AUTO_INCREMENT,
-  `nom` varchar(30) DEFAULT NULL,
-  `auteur` varchar(30) DEFAULT NULL,
-  `annee` int DEFAULT NULL,
-  `categorie` varchar(30) DEFAULT NULL,
-  `resumeLivre` varchar(500) DEFAULT NULL,
-  `etat` varchar(50) DEFAULT NULL,
-  `capacite` int DEFAULT NULL,
-  `startDate` date DEFAULT NULL,
-  `endDate` date DEFAULT NULL,
-  `idUser` int DEFAULT NULL,
-  PRIMARY KEY (`idLivre`),
-  KEY `idUser` (`idUser`),
-  CONSTRAINT `Livre_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TABLE `users` (
+  `idUser` INT NOT NULL AUTO_INCREMENT,
+  `lastName` VARCHAR(50) NOT NULL,
+  `firstName` VARCHAR(50) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(255) NOT NULL UNIQUE,
+  `age` INT CHECK (age >= 0),
+  `birthDate` DATE DEFAULT NULL,
+  `gender` ENUM('Male', 'Female', 'Other', 'Prefer not to say') DEFAULT NULL,
+  `photoURL` VARCHAR(255) DEFAULT NULL,
+  `idUserType` INT NOT NULL DEFAULT 1, -- Guest par défaut
+  `points` INT DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `lastLogin` DATETIME DEFAULT NULL,
+  `isActive` BOOLEAN DEFAULT TRUE,
+  PRIMARY KEY (`idUser`),
+  FOREIGN KEY (`idUserType`) REFERENCES `user_types`(`idUserType`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `Livre`
---
+CREATE TABLE `books` (
+  `idBook` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(100) NOT NULL,
+  `author` VARCHAR(100) NOT NULL,
+  `isbn` VARCHAR(20) UNIQUE DEFAULT NULL,
+  `yearPublished` YEAR DEFAULT NULL,
+  `idCategory` INT DEFAULT NULL,
+  `summary` TEXT DEFAULT NULL,
+  `publisher` VARCHAR(100) DEFAULT NULL,
+  `edition` VARCHAR(50) DEFAULT NULL,
+  `language` VARCHAR(30) DEFAULT NULL,
+  `pageCount` INT DEFAULT NULL,
+  `stock` INT NOT NULL DEFAULT 1 CHECK (stock >= 0),
+  `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `coverImageURL` VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (`idBook`),
+  FOREIGN KEY (`idCategory`) REFERENCES `book_categories`(`idCategory`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-LOCK TABLES `Livre` WRITE;
-/*!40000 ALTER TABLE `Livre` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Livre` ENABLE KEYS */;
-UNLOCK TABLES;
+CREATE TABLE `borrow_records` (
+  `idBorrow` INT NOT NULL AUTO_INCREMENT,
+  `idBook` INT NOT NULL,
+  `idUser` INT NOT NULL,
+  `borrowDate` DATE NOT NULL,
+  `dueDate` DATE NOT NULL,
+  `returnDate` DATE DEFAULT NULL,
+  `status` ENUM('Borrowed', 'Returned', 'Overdue', 'Lost') NOT NULL DEFAULT 'Borrowed',
+  `fineAmount` DECIMAL(10,2) DEFAULT 0.00,
+  `notes` TEXT DEFAULT NULL,
+  PRIMARY KEY (`idBorrow`),
+  FOREIGN KEY (`idBook`) REFERENCES `books`(`idBook`),
+  FOREIGN KEY (`idUser`) REFERENCES `users`(`idUser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Table structure for table `Ordinateur`
---
+CREATE TABLE `reservations` (
+  `idReservation` INT NOT NULL AUTO_INCREMENT,
+  `idUser` INT NOT NULL,
+  `resourceType` ENUM('Book', 'Computer', 'Tablet', 'Seat', 'Room') NOT NULL,
+  `resourceId` INT NOT NULL, -- ID de la ressource réservée
+  `reservationDate` DATE NOT NULL,
+  `startTime` TIME NOT NULL,
+  `endTime` TIME NOT NULL,
+  `status` ENUM('Pending', 'Confirmed', 'Cancelled', 'Completed') NOT NULL DEFAULT 'Pending',
+  `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idReservation`),
+  FOREIGN KEY (`idUser`) REFERENCES `users`(`idUser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `Ordinateur`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Ordinateur` (
-  `idOrdinateur` int NOT NULL AUTO_INCREMENT,
-  `etat` varchar(50) DEFAULT NULL,
-  `useDate` date DEFAULT NULL,
-  `startHour` date DEFAULT NULL,
-  `endHour` date DEFAULT NULL,
-  `idUser` int DEFAULT NULL,
-  PRIMARY KEY (`idOrdinateur`),
-  KEY `idUser` (`idUser`),
-  CONSTRAINT `Ordinateur_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+CREATE TABLE `equipment` (
+  `idEquipment` INT NOT NULL AUTO_INCREMENT,
+  `equipmentType` ENUM('Computer', 'Tablet') NOT NULL,
+  `model` VARCHAR(100) NOT NULL,
+  `brand` VARCHAR(50) NOT NULL,
+  `serialNumber` VARCHAR(50) UNIQUE,
+  `purchaseDate` DATE DEFAULT NULL,
+  `warrantyExpiry` DATE DEFAULT NULL,
+  `status` ENUM('Available', 'In Use', 'Maintenance', 'Retired') NOT NULL DEFAULT 'Available',
+  `lastMaintenanceDate` DATE DEFAULT NULL,
+  `notes` TEXT DEFAULT NULL,
+  PRIMARY KEY (`idEquipment`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `Ordinateur`
---
+CREATE TABLE `equipment_usage` (
+  `idUsage` INT NOT NULL AUTO_INCREMENT,
+  `idEquipment` INT NOT NULL,
+  `idUser` INT NOT NULL,
+  `startDateTime` DATETIME NOT NULL,
+  `endDateTime` DATETIME DEFAULT NULL,
+  `purpose` VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (`idUsage`),
+  FOREIGN KEY (`idEquipment`) REFERENCES `equipment`(`idEquipment`),
+  FOREIGN KEY (`idUser`) REFERENCES `users`(`idUser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-LOCK TABLES `Ordinateur` WRITE;
-/*!40000 ALTER TABLE `Ordinateur` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Ordinateur` ENABLE KEYS */;
-UNLOCK TABLES;
+CREATE TABLE `seats` (
+  `idSeat` INT NOT NULL AUTO_INCREMENT,
+  `seatNumber` VARCHAR(10) NOT NULL,
+  `zone` VARCHAR(50) NOT NULL,
+  `features` SET('Power Outlet', 'Monitor', 'Standing Desk', 'Window View') DEFAULT NULL,
+  `isActive` BOOLEAN DEFAULT TRUE,
+  PRIMARY KEY (`idSeat`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Table structure for table `Tablette`
---
+CREATE TABLE `rooms` (
+  `idRoom` INT NOT NULL AUTO_INCREMENT,
+  `roomName` VARCHAR(50) NOT NULL,
+  `capacity` INT NOT NULL CHECK (capacity > 0),
+  `features` SET('Projector', 'Whiteboard', 'Video Conference', 'Computers') DEFAULT NULL,
+  `isActive` BOOLEAN DEFAULT TRUE,
+  PRIMARY KEY (`idRoom`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `Tablette`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Tablette` (
-  `idTablette` int NOT NULL AUTO_INCREMENT,
-  `etat` varchar(50) DEFAULT NULL,
-  `useDate` date DEFAULT NULL,
-  `startHour` date DEFAULT NULL,
-  `endHour` date DEFAULT NULL,
-  `idUser` int DEFAULT NULL,
-  PRIMARY KEY (`idTablette`),
-  KEY `idUser` (`idUser`),
-  CONSTRAINT `Tablette_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- Historique des activités
+CREATE TABLE `user_activities` (
+  `idActivity` INT NOT NULL AUTO_INCREMENT,
+  `idUser` INT NOT NULL,
+  `activityType` VARCHAR(50) NOT NULL,
+  `description` TEXT DEFAULT NULL,
+  `ipAddress` VARCHAR(45) DEFAULT NULL,
+  `userAgent` TEXT DEFAULT NULL,
+  `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`idActivity`),
+  FOREIGN KEY (`idUser`) REFERENCES `users`(`idUser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `Tablette`
---
+-- Notifications
+CREATE TABLE `notifications` (
+  `idNotification` INT NOT NULL AUTO_INCREMENT,
+  `idUser` INT NOT NULL,
+  `title` VARCHAR(100) NOT NULL,
+  `message` TEXT NOT NULL,
+  `type` ENUM('Info', 'Warning', 'Alert', 'Reminder') NOT NULL DEFAULT 'Info',
+  `isRead` BOOLEAN DEFAULT FALSE,
+  `createdAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `readAt` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`idNotification`),
+  FOREIGN KEY (`idUser`) REFERENCES `users`(`idUser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-LOCK TABLES `Tablette` WRITE;
-/*!40000 ALTER TABLE `Tablette` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Tablette` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `place`
---
-
-DROP TABLE IF EXISTS `place`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `place` (
-  `idPlace` int NOT NULL AUTO_INCREMENT,
-  `etat` varchar(50) DEFAULT NULL,
-  `useDate` date DEFAULT NULL,
-  `startHour` date DEFAULT NULL,
-  `endHour` date DEFAULT NULL,
-  `idUser` int DEFAULT NULL,
-  PRIMARY KEY (`idPlace`),
-  KEY `idUser` (`idUser`),
-  CONSTRAINT `place_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `place`
---
-
-LOCK TABLES `place` WRITE;
-/*!40000 ALTER TABLE `place` DISABLE KEYS */;
-/*!40000 ALTER TABLE `place` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `salle`
---
-
-DROP TABLE IF EXISTS `salle`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `salle` (
-  `idSalle` int NOT NULL AUTO_INCREMENT,
-  `etat` varchar(50) DEFAULT NULL,
-  `capacite` int DEFAULT NULL,
-  `useDate` date DEFAULT NULL,
-  `startHour` date DEFAULT NULL,
-  `endHour` date DEFAULT NULL,
-  `idUser` int DEFAULT NULL,
-  PRIMARY KEY (`idSalle`),
-  KEY `idUser` (`idUser`),
-  CONSTRAINT `salle_ibfk_1` FOREIGN KEY (`idUser`) REFERENCES `user` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `salle`
---
-
-LOCK TABLES `salle` WRITE;
-/*!40000 ALTER TABLE `salle` DISABLE KEYS */;
-/*!40000 ALTER TABLE `salle` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `user`
---
-
-DROP TABLE IF EXISTS `user`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user` (
-  `idUser` int NOT NULL AUTO_INCREMENT,
-  `lname` varchar(50) DEFAULT NULL,
-  `fname` varchar(50) DEFAULT NULL,
-  `pwd` varchar(50) DEFAULT NULL,
-  `age` int DEFAULT NULL,
-  `birthday` date DEFAULT NULL,
-  `sexe` varchar(10) DEFAULT NULL,
-  `photo` varchar(100) DEFAULT NULL,
-  `type` varchar(50) DEFAULT NULL,
-  `points` int DEFAULT NULL,
-  PRIMARY KEY (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user`
---
-
-LOCK TABLES `user` WRITE;
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2025-03-24 17:40:22
+-- Cache
+CREATE TABLE `cache` (
+  `key` VARCHAR(255)
+  `value` VARCHAR(255)
+  `expiration` DATETIME NOT NULL
+)

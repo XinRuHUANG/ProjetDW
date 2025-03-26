@@ -7,7 +7,8 @@ import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+        lastName: '',
+        firstName: '',
         email: '',
         password: '',
         password_confirmation: '',
@@ -24,23 +25,38 @@ export default function Register() {
     return (
         <GuestLayout>
             <Head title="Register" />
-
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                <InputLabel htmlFor="lastName" value="Last Name" />
 
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                    />
+                <TextInput
+                    id="lastName"
+                    name="lastName"
+                    value={data.lastName}
+                    className="mt-1 block w-full"
+                    autoComplete="family-name"
+                    isFocused={true}
+                    onChange={(e) => setData('lastName', e.target.value)}
+                    required
+                />
 
-                    <InputError message={errors.name} className="mt-2" />
+                <InputError message={errors.lastName} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                <InputLabel htmlFor="firstName" value="First Name" />
+
+                <TextInput
+                    id="firstName"
+                    name="firstName"
+                    value={data.firstName}
+                    className="mt-1 block w-full"
+                    autoComplete="given-name"
+                    onChange={(e) => setData('firstName', e.target.value)}
+                    required
+                />
+
+                <InputError message={errors.firstName} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
