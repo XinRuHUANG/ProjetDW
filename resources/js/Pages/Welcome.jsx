@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
+    const [isMenuOpen, setIsMenuOpen] = useState(false); 
     const handleImageError = () => {
         document
             .getElementById('screenshot-container')
