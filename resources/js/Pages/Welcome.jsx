@@ -63,6 +63,25 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 )}
                             </nav>
                         </header>
+                        <div className="flex justify-center my-12">
+  <div className="w-full max-w-2xl px-4">
+    <form className="flex gap-2">
+      <input
+        type="text"
+        placeholder="Rechercher un livre, un auteur..."
+        className="flex-1 py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF2D20] focus:border-transparent"
+      />
+      <button
+        type="submit"
+        className="bg-[#FF2D20] text-white px-6 py-3 rounded-lg hover:bg-[#E82C1F] transition"
+      >
+        Rechercher
+      </button>
+    </form>
+  </div>
+</div>
+                        
+                        
 
                         <main className="mt-6">
                             <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
