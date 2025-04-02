@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 
-// Mock data - will be replaced by real API calls later
+
 const mockRooms = [
   {
     id: 1,
