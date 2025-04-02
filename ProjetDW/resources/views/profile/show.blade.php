@@ -1,3 +1,4 @@
+<!-- resources/views/profile/show.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -5,25 +6,25 @@
     <!-- Section Profil Utilisateur -->
     <div class="bg-white rounded-lg shadow p-6 mb-8">
         <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
-            @if(auth()->user()->photoURL)
-                <img src="{{ asset('storage/' . auth()->user()->photoURL) }}" 
+            @if(auth()->user()->photo_url)
+                <img src="{{ asset('storage/' . auth()->user()->photo_url) }}" 
                      alt="Photo de profil" 
                      class="w-24 h-24 rounded-full object-cover border-2 border-gray-200">
             @else
                 <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-4xl">
-                    {{ strtoupper(substr(auth()->user()->firstName, 0, 1)) }}{{ strtoupper(substr(auth()->user()->lastName, 0, 1)) }}
+                    {{ strtoupper(substr(auth()->user()->first_name, 0, 1)) }}{{ strtoupper(substr(auth()->user()->last_name, 0, 1)) }}
                 </div>
             @endif
             
             <div class="flex-1">
                 <h1 class="text-2xl font-bold text-gray-800">
-                    {{ auth()->user()->firstName }} {{ auth()->user()->lastName }}
+                    {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}
                 </h1>
                 <p class="text-gray-600">{{ auth()->user()->email }}</p>
                 
                 <div class="flex flex-wrap gap-4 mt-4">
                     <div class="bg-blue-50 px-3 py-1 rounded-full text-sm text-blue-800">
-                        {{ auth()->user()->userType }}
+                        {{ auth()->user()->id_user_type }}
                     </div>
                     <div class="bg-green-50 px-3 py-1 rounded-full text-sm text-green-800">
                         {{ auth()->user()->points }} points
@@ -31,8 +32,7 @@
                 </div>
             </div>
             
-            <a href="{{ route('profile.edit') }}" 
-               class="btn btn-primary mt-4 md:mt-0">
+            <a href="{{ route('profile.edit') }}" class="btn btn-primary mt-4 md:mt-0">
                 Modifier le profil
             </a>
         </div>
@@ -140,3 +140,4 @@
     </div>
 </div>
 @endsection
+

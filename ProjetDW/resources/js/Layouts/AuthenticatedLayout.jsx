@@ -19,11 +19,11 @@ export default function AuthenticatedLayout({ header, children }) {
                             <div className="flex items-center space-x-3 cursor-pointer">
                                 <img 
                                     src={auth.user.photo_path || '/images/default-avatar.jpg'} 
-                                    alt={auth.user.name}
+                                    alt={auth.user.first_name}
                                     className="w-10 h-10 rounded-full"
                                 />
                                 <div>
-                                    <p className="font-medium">{auth.user.name}</p>
+                                    <p className="font-medium">{auth.first_name}</p>
                                     <p className="text-xs text-gray-500">Membre</p>
                                 </div>
                             </div>
@@ -33,6 +33,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             <Dropdown.Link href={route('profile.edit')}>
                                 👤 Mon profil
                             </Dropdown.Link>
+                            
                             <Dropdown.Link href={route('logout')} method="post" as="button">
                                 🚪 Déconnexion
                             </Dropdown.Link>

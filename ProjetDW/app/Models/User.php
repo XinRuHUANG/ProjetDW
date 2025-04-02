@@ -14,7 +14,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $primaryKey = 'idUser';
+    protected $primaryKey = 'id_user';
     protected $table = 'users';
 
     /**
@@ -23,15 +23,15 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'lastName',
-        'firstName',
+        'last_name',
+        'first_name',
         'email',
         'password',
         'age',
-        'birthDate',
+        'birthday',
         'gender',
-        'photoURL',
-        'userType',
+        'photo_url',
+        'id_user_type',
         'points'
     ];
 
@@ -50,7 +50,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'birthDate' => 'date',
+        'birthday' => 'date',
         'email_verified_at' => 'datetime',
     ];
 
@@ -59,7 +59,7 @@ class User extends Authenticatable
     */
     public function favoriteBooks(): BelongsToMany
     {
-        return $this->belongsToMany(Book::class, 'favorites', 'idUser', 'idBook')
+        return $this->belongsToMany(Book::class, 'favorites', 'id_user', 'idbook')
                 ->using(Favorite::class)
                 ->withTimestamps();
     }
@@ -69,7 +69,7 @@ class User extends Authenticatable
      */
     public function borrowedBooks(): HasMany
     {
-        return $this->hasMany(Book::class, 'idUser');
+        return $this->hasMany(Book::class, 'id_user');
     }
 
     /**
@@ -77,7 +77,7 @@ class User extends Authenticatable
      */
     public function computers(): HasMany
     {
-        return $this->hasMany(Computer::class, 'idUser');
+        return $this->hasMany(Computer::class, 'id_user');
     }
 
     /**
@@ -85,7 +85,7 @@ class User extends Authenticatable
      */
     public function tablets(): HasMany
     {
-        return $this->hasMany(Tablet::class, 'idUser');
+        return $this->hasMany(Tablet::class, 'id_user');
     }
 
     /**
@@ -93,7 +93,7 @@ class User extends Authenticatable
      */
     public function seats(): HasMany
     {
-        return $this->hasMany(Seat::class, 'idUser');
+        return $this->hasMany(Seat::class, 'id_user');
     }
 
     /**
@@ -101,7 +101,7 @@ class User extends Authenticatable
      */
     public function rooms(): HasMany
     {
-        return $this->hasMany(Room::class, 'idUser');
+        return $this->hasMany(Room::class, 'id_user');
     }
 
     /**
@@ -109,7 +109,7 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        return $this->userType === 'Admin';
+        return $this->id_user_type === '3';
     }
 
     /**

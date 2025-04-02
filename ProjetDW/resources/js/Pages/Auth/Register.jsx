@@ -7,8 +7,8 @@ import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        lastName: '',
-        firstName: '',
+        last_name: '',
+        first_name: '',
         email: '',
         password: '',
         password_confirmation: '',
@@ -27,36 +27,36 @@ export default function Register() {
             <Head title="Register" />
             <form onSubmit={submit}>
                 <div>
-                <InputLabel htmlFor="lastName" value="Last Name" />
+                <InputLabel htmlFor="last_name" value="Last_name" />
 
                 <TextInput
-                    id="lastName"
-                    name="lastName"
-                    value={data.lastName}
+                    id="last_name"
+                    name="last_name"
+                    value={data.last_name}
                     className="mt-1 block w-full"
                     autoComplete="family-name"
                     isFocused={true}
-                    onChange={(e) => setData('lastName', e.target.value)}
+                    onChange={(e) => setData('last_name', e.target.value)}
                     required
                 />
 
-                <InputError message={errors.lastName} className="mt-2" />
+                <InputError message={errors.last_name} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                <InputLabel htmlFor="firstName" value="First Name" />
+                <InputLabel htmlFor="first_name" value="First_name" />
 
                 <TextInput
-                    id="firstName"
-                    name="firstName"
-                    value={data.firstName}
+                    id="first_name"
+                    name="first_name"
+                    value={data.first_name}
                     className="mt-1 block w-full"
                     autoComplete="given-name"
-                    onChange={(e) => setData('firstName', e.target.value)}
+                    onChange={(e) => setData('first_name', e.target.value)}
                     required
                 />
 
-                <InputError message={errors.firstName} className="mt-2" />
+                <InputError message={errors.first_name} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
