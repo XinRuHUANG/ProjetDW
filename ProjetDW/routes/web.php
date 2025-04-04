@@ -9,14 +9,12 @@ use Inertia\Inertia;
 
 // Page d'accueil avec redirection vers le Dashboard si connecté
 Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('dashboard')
-        : Inertia::render('Welcome', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-            'laravelVersion' => Application::VERSION,
-            'phpVersion' => PHP_VERSION,
-        ]);
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
 })->name('home');
 
 Route::get('/accueil', function () {
@@ -54,7 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard principal
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+        return Inertia::render('MemberDashboard');
     })->name('dashboard');
 
     // Gestion du profil utilisateur

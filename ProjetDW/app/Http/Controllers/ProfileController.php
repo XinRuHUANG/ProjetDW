@@ -21,10 +21,10 @@ class ProfileController extends Controller
             'status' => session('status'),
             'user' => Auth::user(), // ✅ Ajout de l'utilisateur
             'userData' => $request->user()->only([
-                'firstName', 
-                'lastName', 
+                'first_name', 
+                'last_name', 
                 'email', 
-                'photoURL', 
+                'photo_url', 
                 'birthDate'
             ]),
         ]);
@@ -41,10 +41,10 @@ class ProfileController extends Controller
         // Gestion de l'image de profil
         if ($request->hasFile('photo')) {
             // Supprimer l'ancienne image si elle existe
-            if ($user->photoURL) {
-                Storage::disk('public')->delete($user->photoURL);
+            if ($user->photo_url) {
+                Storage::disk('public')->delete($user->photo_url);
             }
-            $data['photoURL'] = $request->file('photo')->store('profiles', 'public');
+            $data['photo_url'] = $request->file('photo')->store('profiles', 'public');
         }
 
         // Gestion spéciale pour l'email
