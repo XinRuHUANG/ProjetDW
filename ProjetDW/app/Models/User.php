@@ -32,7 +32,10 @@ class User extends Authenticatable
         'gender',
         'photo_url',
         'id_user_type',
-        'points'
+        'points',
+        'books_read',
+        'library_hours',
+        'printed_pages'
     ];
 
     /**
@@ -115,9 +118,22 @@ class User extends Authenticatable
     /**
      * Ajoute des points à l'utilisateur
      */
-    public function addPoints(int $points): void
+    public function addPoints(int $points, string $reason)
     {
         $this->points += $points;
         $this->save();
+        
+        // Historique des points
+        PointHistory::create([
+            'user_id' => $this->id,
+            'points' => $points,
+            'reason' => $reason,
+            'remaining_points' => $this->points
+        ]);
+    }
+
+    public function pointHistories()
+    {
+        return $this->hasMany(PointHistory::class);
     }
 }

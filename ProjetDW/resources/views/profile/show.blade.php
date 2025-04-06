@@ -138,6 +138,49 @@
             </div>
         @endif
     </div>
+
+    <div class="points-system">
+        <h3>Vos points: {{ $user->points }}</h3>
+        
+        <div class="progress">
+            <div class="progress-bar" style="width: {{ ($user->points/100)*100 }}%"></div>
+        </div>
+        
+        <h4>Historique des points</h4>
+        <table class="table">
+            @foreach($user->pointHistories as $history)
+            <tr>
+                <td>{{ $history->created_at->format('d/m/Y') }}</td>
+                <td>{{ $history->reason }}</td>
+                <td>{{ $history->points > 0 ? '+' : '' }}{{ $history->points }}</td>
+            </tr>
+            @endforeach
+        </table>
+        
+        <button class="btn btn-info" data-toggle="modal" data-target="#pointsRules">
+            Voir les règles d'obtention
+        </button>
+    </div>
+
+    <!-- Modal des règles -->
+    <div class="modal fade" id="pointsRules">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Règles des points</h5>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li>Inscription: +10 pts</li>
+                        <li>Lecture de 3 livres: +10 pts</li>
+                        <li>Présence de 2h à la bibliothèque: +5 pts</li>
+                        <li>Utilisateur actif (3 livres + 15h/mois): +5 pts</li>
+                        <li>Utilisation imprimante: -10 pts/page</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 

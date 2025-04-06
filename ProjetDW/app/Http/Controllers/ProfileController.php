@@ -104,6 +104,8 @@ class ProfileController extends Controller
             'rooms'
         ]);
 
+        $histories = $user->pointHistories()->orderBy('created_at', 'desc')->get();
+
         return Inertia::render('Profile/Show', [
             'user' => $user,
             'stats' => [
@@ -113,7 +115,8 @@ class ProfileController extends Controller
                                       $user->tablets->count() +
                                       $user->seats->count() +
                                       $user->rooms->count()
-            ]
+            ],
+            'pointHistories' => $histories
         ]);
     }
 }

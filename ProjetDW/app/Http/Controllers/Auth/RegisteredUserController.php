@@ -45,6 +45,10 @@ class RegisteredUserController extends Controller
         ]);
         //event(new Registered($user));
 
+        //Ajout de points l'inscription
+        $user->addPoints(10, 'Inscription');
+
+
         Auth::login($user);
 \Log::info("Redirection vers le dashboard pour l'utilisateur : " . $user->id);
         return redirect(route('dashboard', absolute: false));

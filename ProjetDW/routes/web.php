@@ -46,6 +46,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Ressources pour les livres et appareils
     Route::resource('books', BookController::class)->except(['create', 'edit']);
     Route::resource('devices', DeviceController::class)->except(['create', 'edit']);
+
+    // Gestion des points
+    Route::get('/profile', [ProfileController::class, 'show'])->middleware('auth');
+    Route::post('/books/{book}/mark-read', [BookController::class, 'markAsRead'])->middleware('auth');
+    Route::post('/record-attendance', [LibraryAttendanceController::class, 'recordAttendance'])->middleware('auth');
+    Route::post('/record-print', [PrintingController::class, 'recordPrint'])->middleware('auth');
 });
 
 // Routes d'authentification (login, register, etc.)
