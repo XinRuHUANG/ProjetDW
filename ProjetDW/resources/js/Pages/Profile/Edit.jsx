@@ -39,7 +39,7 @@ export default function Edit({ mustVerifyEmail, status, user}) {
                 <h2>Mes favoris</h2>
 
                 {/* Vérifier si l'utilisateur a des favoris */}
-                {user.favorites.length === 0 ? (
+                {user?.favorites.length === 0 ? (
                     <p>Aucun livre dans vos favoris pour le moment.</p>
                 ) : (
                     <ul>

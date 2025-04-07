@@ -23,4 +23,15 @@ class BookController extends Controller{
         
         return back()->with('success', 'Livre marqué comme lu');
     }
+
+    public function index()
+    {
+        // Récupère tous les livres
+        $books = Book::all();
+        
+        // Retourne la vue Inertia avec les données
+        return Inertia::render('Books/Index', [
+            'books' => $books
+        ]);
+    }
 }

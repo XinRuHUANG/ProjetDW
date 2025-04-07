@@ -261,7 +261,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             {searchQuery || yearFilter || genreFilter ? "Résultats" : "À la une"}
         </h2>
         
-        {filteredBooks.length > 0 ? (
+        {filteredBooks?.length > 0 ? (
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {filteredBooks.map((book) => (
                     <div key={book.id} className="group cursor-pointer">

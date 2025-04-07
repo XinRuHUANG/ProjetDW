@@ -11,7 +11,7 @@ export default function Favorites({ auth, favorites }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <h1 className="text-2xl font-bold mb-6">Mes Livres Favoris</h1>
                         
-                        {favorites.data.length === 0 ? (
+                        {favorites.data?.length === 0 ? (
                             <div className="text-center py-12">
                                 <p className="text-gray-500 mb-4">Vous n'avez aucun livre favori.</p>
                                 <Link 

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('photoURL', 255)->nullable();
             $table->enum('userType', ['Admin', 'Member2', 'Member1', 'Guest'])->default('Guest');
             $table->integer('points')->default(0);
+            $table->string('reason');
+            $table->integer('remaining_points');
             $table->timestamps();
         });
 

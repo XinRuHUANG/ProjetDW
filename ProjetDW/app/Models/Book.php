@@ -32,7 +32,7 @@ class Book extends Model
         'summary',
         'status',
         'stock',
-        // ... autres champs
+        'cover_image_url'
     ];
 
     /**

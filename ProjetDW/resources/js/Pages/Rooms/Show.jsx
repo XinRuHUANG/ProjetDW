@@ -88,7 +88,7 @@ export default function RoomShow() {
                   
                   <div className="mt-6">
                     <h3 className="font-medium mb-2">Réservations aujourd'hui</h3>
-                    {mockReservations.length > 0 ? (
+                    {mockReservations?.length > 0 ? (
                       <ul className="space-y-2">
                         {mockReservations.map(res => (
                           <li key={res.id} className="text-sm">

@@ -15,7 +15,7 @@ export default function FavoritesIndex({ favorites, setFavorites }) {
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <h1 className="text-2xl font-bold mb-6">Mes Favoris</h1>
                             
-                            {favorites.length > 0 ? (
+                            {favorites?.length > 0 ? (
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                                     {favorites.map(book => (
                                         <div key={book.id} className="relative group">
