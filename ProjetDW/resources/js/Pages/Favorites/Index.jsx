@@ -1,11 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 
-export default function FavoritesIndex({ favorites, setFavorites }) {
-    const removeFavorite = (bookId) => {
-        setFavorites(prev => prev.filter(book => book.id !== bookId));
-    };
-
+export default function FavoritesIndex({ favorites }) {
+   
     return (
         <AuthenticatedLayout>
             <Head title="Mes Favoris" />
@@ -15,12 +12,12 @@ export default function FavoritesIndex({ favorites, setFavorites }) {
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <h1 className="text-2xl font-bold mb-6">Mes Favoris</h1>
                             
-                            {favorites?.length > 0 ? (
+                            {favorites.length > 0 ? (
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                                     {favorites.map(book => (
-                                        <div key={book.id} className="relative group">
+                                        <div key={book.idBook} className="relative group">
                                             <button
-                                                onClick={() => removeFavorite(book.id)}
+                                                onClick={() => removeFavorite(book.idBook)}
                                                 className="absolute top-2 right-2 p-1 bg-white rounded-full shadow"
                                             >
                                                 ❌
