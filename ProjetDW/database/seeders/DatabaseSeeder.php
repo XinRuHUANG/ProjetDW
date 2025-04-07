@@ -5,13 +5,12 @@ namespace Database\Seeders;
 use App\Models\{User, Book, Computer, Tablet, Seat, Room, BookCategory};
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Désactiver les événements de modèle
+        // Désactiver les événements de modèle pour éviter certains triggers
         User::withoutEvents(function () {
             // Admin
             User::create([
@@ -39,10 +38,14 @@ class DatabaseSeeder extends Seeder
                 'points' => 500
             ]);
 
-            // Utilisateurs aléatoires
+            // Utilisateurs aléatoires via factory
             User::factory(10)->create();
         });
 
-        // Autres seeds...
+        // Appel aux autres seeders
+        $this->call([
+            BookSeeder::class,
+           
+        ]);
     }
 }
