@@ -2,60 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
-use Illuminate\Http\{Request, JsonResponse};
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
-    /**
-     * Basculer l'état favori d'un livre
-     */
-    public function toggle(Request $request, Book $book): JsonResponse
+    public function index()
     {
-        try {
-            $request->user()->favoriteBooks()->toggle($book->idBook);
-            
-            $isFavorite = $request->user()->favoriteBooks()
-                ->where('idBook', $book->idBook)
-                ->exists();
-                
-            return response()->json([
-                'status' => 'success',
-                'isFavorite' => $isFavorite,
-                'message' => $isFavorite 
-                    ? 'Livre ajouté aux favoris' 
-                    : 'Livre retiré des favoris'
-            ]);
+        $favorites = Auth::user()->favoriteBooks()->get();
 
-        } catch (\Exception $e) {
-            Log::error('Favorite toggle error: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Une erreur est survenue'
-            ], 500);
-        }
+        return inertia('Favorites/Index', [
+            'favorites' => $favorites,
+        ]);
     }
 
-    /**
-     * Lister les favoris paginés
-     */
-    public function index(Request $request): JsonResponse
+    public function toggle(Request $request)
     {
-        try {
-            $favorites = $request->user()
-                ->favoriteBooks()
-                ->with(['author', 'category'])
-                ->paginate(10);
-                
-            return response()->json($favorites);
-            
-        } catch (\Exception $e) {
-            Log::error('Favorites list error: ' . $e->getMessage());
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Impossible de charger les favoris'
-            ], 500);
+        $bookId = $request->input('idBook');
+        $user = Auth::user();
+
+        // Correction : on précise bien "books.idBook"
+        if ($user->favoriteBooks()->where('books.idBook', $bookId)->exists()) {
+            $user->favoriteBooks()->detach($bookId);
+        } else {
+            $user->favoriteBooks()->attach($bookId);
         }
+
+        return response()->json(['success' => true]);
     }
 }
