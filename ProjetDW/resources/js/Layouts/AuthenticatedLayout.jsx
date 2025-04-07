@@ -46,7 +46,8 @@ export default function AuthenticatedLayout({ header, children }) {
                     <ul className="space-y-2">
                         <li>
                             <NavLink
-                                href="/members"
+                                href={route('members.index')}
+                                active={route().current('members.index')}
                                 
                                 className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-700"
                             >
@@ -64,16 +65,27 @@ export default function AuthenticatedLayout({ header, children }) {
                         </li>
                         <li>
                             <NavLink
-                                href={route('devices.index')}
-                                active={route().current('devices.index')}
+                                href="/"
+                                
                                 className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-700"
                             >
                                 💻 Appareils
                             </NavLink>
                         </li>
+                        <li>
+    <NavLink
+        href={route('favorites.index')}
+        active={route().current('favorites.index')}
+        className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-700"
+    >
+        ❤️ Favoris
+    </NavLink>
+</li>
+
                     </ul>
                 </nav>
             </div>
+            
 
             {/* Overlay mobile */}
             {sidebarOpen && (
@@ -99,7 +111,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 </button>
 
                 {/* Logo cliquable (visible sur tous les écrans) */}
-                <Link href="/" className="flex items-center">
+                <Link href={route('welcome.public')} className="flex items-center">
                     <ApplicationLogo className="h-8 w-auto fill-current text-gray-800 dark:text-white" />
                     <span className="ml-2 text-xl font-semibold dark:text-white hidden md:block">Bibliotech</span>
                 </Link>
