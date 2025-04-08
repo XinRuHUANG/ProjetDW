@@ -2,108 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use App\Models\{User, Book, Computer, Tablet, Seat, Room};
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Http\{RedirectResponse, Request, JsonResponse};
-use Illuminate\Support\Facades\{Auth, Redirect, Storage};
-use Inertia\{Inertia, Response};
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ProfileController extends Controller
 {
     /**
-     * Affiche le formulaire de profil utilisateur
+     * Affiche le profil de l'utilisateur connecté
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+
         return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => session('status'),
-            'user' => Auth::user(), // ✅ Ajout de l'utilisateur
-            'userData' => $request->user()->only([
-                'first_name', 
-                'last_name', 
-                'email', 
-                'photo_url', 
-                'birthDate'
-            ]),
+            'user' => [
+                'id'            => $user->id,
+                'first_name'    => $user->first_name,
+                'last_name'     => $user->last_name,
+                'age'           => $user->age,
+                'gender'        => $user->gender,
+                'birthday'      => $user->birthday,
+                'email'         => $user->email,
+                'points'        => $user->points,
+                'photo_url'     => $user->photo_url,
+                'is_active'     => $user->is_active,
+                'id_user_type'  => $user->id_user_type,
+            ],
         ]);
     }
 
     /**
-     * Met à jour les informations du profil
+     * Déconnecter et supprimer le compte utilisateur
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function destroy(Request $request)
     {
         $user = $request->user();
-        $data = $request->validated();
-
-        // Gestion de l'image de profil
-        if ($request->hasFile('photo')) {
-            // Supprimer l'ancienne image si elle existe
-            if ($user->photo_url) {
-                Storage::disk('public')->delete($user->photo_url);
-            }
-            $data['photo_url'] = $request->file('photo')->store('profiles', 'public');
-        }
-
-        // Gestion spéciale pour l'email
-        if ($user->isDirty('email')) {
-            $data['email_verified_at'] = null;
-        }
-
-        $user->update($data);
-
-        if ($user->wasChanged('email')) {
-            $user->sendEmailVerificationNotification();
-        }
-
-        return Redirect::route('profile.edit')->with('status', 'Profil mis à jour!');
-    }
-
-    /**
-     * Supprime le compte utilisateur
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-
-        // Nettoyage des relations avant suppression
-        $user->favorites()->detach();
-        $user->borrowedBooks()->update(['idUser' => null]);
-        
-        // Suppression de la photo de profil
-        if ($user->photoURL) {
-            Storage::disk('public')->delete($user->photoURL);
-        }
 
         Auth::logout();
+
         $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/')->with('status', 'Votre compte a été supprimé.');
+        return Redirect::to('/');
     }
-
-    /**
-     * Affiche le profil utilisateur avec toutes ses données
-     */
-    public function show(): Response
+    
+        public function update(Request $request): RedirectResponse
     {
-        $user = auth()->user()->load([
-            'favoriteBooks' => fn($query) => $query->select(['idBook', 'title', 'author']),
-            'borrowedBooks' => fn($query) => $query->select(['idBook', 'title', 'author']),
-            'computers',
-            'tablets',
-            'seats',
-            'rooms'
+        $user = $request->user();
+
+        $data = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
+            'photo_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'birthday' => 'nullable|date',
+            'gender' => 'nullable|in:male,female,other',
+            'points' => 'required|integer',
         ]);
 
+<<<<<<< HEAD
         $histories = $user->pointHistories()->orderBy('created_at', 'desc')->get();
 
         return Inertia::render('Profile/Show', [
@@ -118,5 +81,24 @@ class ProfileController extends Controller
             ],
             'pointHistories' => $histories
         ]);
+=======
+        if ($request->hasFile('photo_url')) {
+            // Supprimer l'ancienne photo si elle existe
+            if ($user->photo_url && Storage::exists('public/' . $user->photo_url)) {
+                Storage::delete('public/' . $user->photo_url);
+            }
+
+            // Sauvegarder la nouvelle
+            $data['photo_url'] = $request->file('photo_url')->store('profile-photos', 'public');
+        }
+
+        $user->update($data);
+        
+        $this->updateUserTypeBasedOnPoints($user);
+
+        return redirect()->route('profile.edit')->with('status', 'Profil mis à jour avec succès.');
+>>>>>>> bf8e38b (dernier modif)
     }
+
 }
+

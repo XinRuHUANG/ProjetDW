@@ -104,6 +104,16 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         Favoris
                                     </Link>
                                 </li>
+                                <li>
+                                    {auth.user && auth.user.id_user_type === 3 && (
+                                        <Link
+                                            href={route('admin.dashboard')}
+                                            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+                                        >
+                                            Espace Admin
+                                        </Link>
+                                    )}
+                                </li>
                             </ul>
                         </nav>
                     </div>

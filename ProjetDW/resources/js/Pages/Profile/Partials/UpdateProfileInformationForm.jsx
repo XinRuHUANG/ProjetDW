@@ -14,13 +14,18 @@ export default function UpdateProfileInformation({
 
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
-            name: user.name,
-            email: user.email,
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        email: user.email || '',
+        birthday: user.birthday || '',
+        gender: user.gender || '',
+        photo_url: user.photo_url || '',
         });
+        
 
-    const submit = (e) => {
+
+       const submit = (e) => {
         e.preventDefault();
-
         patch(route('profile.update'));
     };
 
@@ -37,21 +42,69 @@ export default function UpdateProfileInformation({
             </header>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
 
-                    <TextInput
-                        id="name"
-                        className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        isFocused
-                        autoComplete="name"
-                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium">Photo de profil</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            name="photo_url"
+                            onChange={(e) => setData('photo_url', e.target.files[0])}
+                            className="w-full mt-1 p-2 border rounded"
+                        />
+                        {errors.photo && <p className="text-red-500 text-sm">{errors.photo}</p>}
+                    </div>
+                    
+                        <div>
+                            <label className="block text-sm font-medium">Prénom</label>
+                            <input
+                                type="text"
+                                value={data.first_name}
+                                onChange={(e) => setData('first_name', e.target.value)}
+                                className="w-full mt-1 p-2 border rounded"
+                            />
+                            {errors.first_name && <p className="text-red-500 text-sm">{errors.first_name}</p>}
+                        </div>
 
-                    <InputError className="mt-2" message={errors.name} />
-                </div>
+                        <div>
+                            <label className="block text-sm font-medium">Nom</label>
+                            <input
+                                type="text"
+                                value={data.last_name}
+                                onChange={(e) => setData('last_name', e.target.value)}
+                                className="w-full mt-1 p-2 border rounded"
+                            />
+                            {errors.last_name && <p className="text-red-500 text-sm">{errors.last_name}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium">Date de naissance</label>
+                            <input
+                                type="date"
+                                value={data.birthday}
+                                onChange={(e) => setData('birthday', e.target.value)}
+                                className="w-full mt-1 p-2 border rounded"
+                            />
+                            {errors.birthday && <p className="text-red-500 text-sm">{errors.birthday}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium">Genre</label>
+                            <select
+                                value={data.gender}
+                                onChange={(e) => setData('gender', e.target.value)}
+                                className="w-full mt-1 p-2 border rounded"
+                            >
+                                <option value="">Sélectionner</option>
+                                <option value="male">Homme</option>
+                                <option value="female">Femme</option>
+                                <option value="other">Autre</option>
+                            </select>
+                            {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
+                        </div>
+                    </div>
+
 
                 <div>
                     <InputLabel htmlFor="email" value="Email" />

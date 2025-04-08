@@ -12,7 +12,7 @@ class Book extends Model
      * Clé primaire de la table
      * @var string
      */
-    protected $primaryKey = 'idBook';
+    protected $primaryKey = 'id_book';
 
     /**
      * Nom de la table associée au modèle
@@ -24,16 +24,20 @@ class Book extends Model
      * Champs remplissables massivement
      * @var array
      */
+
     protected $fillable = [
         'title',
         'author',
-        'yearPublished',
-        'category',
+        'isbn',
+        'year',
+        'id_category',
         'summary',
-        'status',
         'stock',
-        // ... autres champs
+        'status',
+        'cover_image_url',
     ];
+
+    public $timestamps = true;
 
     /**
      * Relation avec l'utilisateur qui a emprunté le livre
@@ -41,7 +45,7 @@ class Book extends Model
      */
     public function borrowedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'idUser');
+        return $this->belongsTo(User::class, 'id_user');
     }
 
     /**
@@ -50,7 +54,7 @@ class Book extends Model
      */
     public function favoritedBy(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'favorites', 'idBook', 'idUser')
+        return $this->belongsToMany(User::class, 'favorites', 'id_book', 'id_bser')
                    ->using(Favorite::class)
                    ->withTimestamps();
     }
@@ -61,7 +65,7 @@ class Book extends Model
      */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(BookCategory::class, 'idCategory');
+        return $this->belongsTo(BookCategory::class, 'id_category');
     }
 
     /**

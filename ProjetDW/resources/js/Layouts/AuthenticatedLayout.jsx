@@ -1,46 +1,40 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
 
-export default function AuthenticatedLayout({ header, children }) {
+export default function AuthenticatedLayout({ children, header }) {
     const { auth } = usePage().props;
-    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-            {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-zinc-800 shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:translate-x-0`}>
-                {/* Section Membre avec dropdown */}
-                <div className="p-4 border-b border-gray-200 dark:border-zinc-700">
-                    <Dropdown>
-                        <Dropdown.Trigger>
-                            <div className="flex items-center space-x-3 cursor-pointer">
-                                <img 
-                                    src={auth.user.photo_path || '/images/default-avatar.jpg'} 
-                                    alt={auth.user.first_name}
-                                    className="w-10 h-10 rounded-full"
-                                />
-                                <div>
-                                    <p className="font-medium">{auth.first_name}</p>
-                                    <p className="text-xs text-gray-500">Membre</p>
-                                </div>
-                            </div>
-                        </Dropdown.Trigger>
-
-                        <Dropdown.Content align="left" width="48">
-                            <Dropdown.Link href={route('profile.edit')}>
-                                👤 Mon profil
-                            </Dropdown.Link>
-                            
-                            <Dropdown.Link href={route('logout')} method="post" as="button">
-                                🚪 Déconnexion
-                            </Dropdown.Link>
-                        </Dropdown.Content>
-                    </Dropdown>
+        <div className="min-h-screen bg-gray-100">
+            {/* Navigation */}
+            <nav className="bg-white shadow">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between h-16 items-center">
+                        <div className="flex space-x-4 items-center">
+                            <Link href="/" className="text-lg font-bold text-gray-800">
+                                🏠 Dashboard
+                            </Link>
+                            <Link href={route('profile.edit')} className="text-gray-600 hover:text-gray-800">
+                                👤 Profil
+                            </Link>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            <span className="text-gray-600 text-sm">
+                                {auth.user.first_name} {auth.user.last_name}
+                            </span>
+                            <Link
+                                href={route('logout')}
+                                method="post"
+                                as="button"
+                                className="text-red-600 hover:text-red-800 text-sm"
+                            >
+                                Se déconnecter
+                            </Link>
+                        </div>
+                    </div>
                 </div>
+            </nav>
 
+<<<<<<< HEAD
                 {/* Navigation principale */}
                 <nav className="p-4">
                     <ul className="space-y-2">
@@ -136,6 +130,20 @@ export default function AuthenticatedLayout({ header, children }) {
                     {children}
                 </div>
             </main>
+=======
+            {/* Header */}
+            {header && (
+                <header className="bg-white shadow">
+                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {header}
+                    </div>
+                </header>
+            )}
+
+            {/* Main content */}
+            <main>{children}</main>
+>>>>>>> bf8e38b (dernier modif)
         </div>
     );
 }
+

@@ -5,7 +5,9 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\DeviceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
 use Inertia\Inertia;
+       use Illuminate\Support\Facades\Mail;
 
 // Page d'accueil avec redirection vers le Dashboard si connecté
 Route::get('/', function () {
@@ -48,7 +50,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/objets-connectes', [ConnectedDeviceController::class, 'index'])->name('devices.index');
  // Salles
     Route::get('/salles', fn () => Inertia::render('Rooms/Index'))->name('salles.index');
+<<<<<<< HEAD
 
+=======
+    Route::get('/livres', fn () => Inertia::render('Books/Index'))->name('livres.index');
+    
+
+
+    Route::get('/books', [BookController::class, 'index'])->name('books.index');
+>>>>>>> bf8e38b (dernier modif)
 
     // Dashboard principal
     Route::get('/dashboard', function () {
@@ -66,6 +76,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{user}', [MemberController::class, 'show'])->name('members.show'); });
     
 
+<<<<<<< HEAD
     // Ressources pour les livres et appareils
     Route::resource('books', BookController::class)->except(['create', 'edit']);
     Route::resource('devices', DeviceController::class)->except(['create', 'edit']);
@@ -77,6 +88,41 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/record-print', [PrintingController::class, 'recordPrint'])->middleware('auth');
 
     
+=======
+    // Room
+    Route::post('/admin/rooms', [AdminController::class, 'storeRoom'])->name('admin.rooms.store');
+
+    // Book
+    Route::post('/admin/books', [AdminController::class, 'storeBook'])->name('admin.books.store');
+
+    // Seat
+    Route::post('/admin/seats', [AdminController::class, 'storeSeat'])->name('admin.seats.store');
+
+    // Equipment
+    Route::post('/admin/equipments', [AdminController::class, 'storeEquipment'])->name('admin.equipments.store');
+
+
+     
+    
+
+});
+
+ 
+
+Route::get('/test-mail', function () {
+    Mail::raw('Test simple depuis Laravel', function ($message) {
+        $message->to('test@example.com')->subject('Test Laravel Mail');
+    });
+
+    return 'Mail envoyé';
+});
+
+    //admin page
+    Route::middleware(['auth', 'is_admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
+    Route::patch('/admin/users/update', [AdminController::class, 'updateUserType'])->name('admin.users.update');
+    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+>>>>>>> bf8e38b (dernier modif)
 });
 
 // Routes d'authentification (login, register, etc.)

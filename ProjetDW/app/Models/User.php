@@ -8,9 +8,10 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Book;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Favorite;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -81,6 +82,17 @@ class User extends Authenticatable
     public function computers(): HasMany
     {
         return $this->hasMany(Computer::class, 'id_user');
+    }
+    
+        /**
+     * Calculer l'age à partir de la date de naissance
+     */
+    
+    protected $appends = ['age'];
+
+    public function getAgeAttribute()
+    {
+        return \Carbon\Carbon::parse($this->birthday)->age;
     }
 
     /**
