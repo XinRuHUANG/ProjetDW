@@ -13,7 +13,7 @@ class ConnectedDeviceController extends Controller
         $query = Equipment::query();
 
         if ($request->has('type') && $request->type !== '') {
-            $query->where('equipmentType', $request->type);
+            $query->where('equipment_type', $request->type);
         }
 
         if ($request->has('status') && $request->status !== '') {

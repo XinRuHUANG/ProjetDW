@@ -9,7 +9,7 @@ class MemberController extends Controller
 {
     public function index()
     {
-        $members = User::where('userType', '!=', 'Admin')->get(); // ou '3' si c'est codé comme ça
+        $members = User::where('id_user_type', '!=', '3')->get(); // ou '3' si c'est codé comme ça
 
         return Inertia::render('Members/Index', [
             'members' => $members,

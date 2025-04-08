@@ -85,19 +85,19 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         Livres
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link href={route('objets.connectes')} 
-       
-                                   
-                                    className="block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-black dark:text-white">
-                                        Objet Connectés
-                                    </Link>
-                                </li>
+                                
                                 <li>
                                     <Link href={route('salles.index')} className="block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-black dark:text-white">
                                         Salles
                                     </Link>
                                 </li>
+                                
+                                <li>
+                                    <Link href={route('objets-connectes.index')} className="block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-black dark:text-white">
+                                        Objets connectés
+                                    </Link>
+                                </li>
+                                
                                 <li>
                                     <Link href="#" 
                                     className="block px-4 py-2 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 text-black dark:text-white">

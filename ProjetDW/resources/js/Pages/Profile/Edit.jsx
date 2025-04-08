@@ -30,25 +30,6 @@ export default function Edit({ auth, user }) {
                         <p className="text-gray-500">{user.email}</p>
                     </div>
                 </div>
-<<<<<<< HEAD
-            </div>
-
-            <div>
-                <h2>Mes favoris</h2>
-
-                {/* Vérifier si l'utilisateur a des favoris */}
-                {user?.favorites.length === 0 ? (
-                    <p>Aucun livre dans vos favoris pour le moment.</p>
-                ) : (
-                    <ul>
-                        {user.favorites.map((favorite) => (
-                        <li key={favorite.id}>
-                            <strong>{favorite.title}</strong> par {favorite.author} (publiée en {favorite.yearPublished})
-                        </li>
-                        ))}
-                    </ul>
-                )}
-=======
                 
                 
                 <hr className="my-6" />
@@ -65,7 +46,6 @@ export default function Edit({ auth, user }) {
                     <p><strong>Créé le :</strong> {new Date(user.created_at).toLocaleDateString()}</p>
                     <p><strong>Dernière mise à jour :</strong> {new Date(user.updated_at).toLocaleDateString()}</p>
                 </div>
->>>>>>> bf8e38b (dernier modif)
             </div>
         </AuthenticatedLayout>
     );

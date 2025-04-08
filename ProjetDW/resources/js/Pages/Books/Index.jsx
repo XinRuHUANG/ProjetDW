@@ -5,7 +5,9 @@ import axios from 'axios';
 
 export default function BooksIndex({ books: serverBooks, userFavorites }) {
     const [books, setBooks] = useState(serverBooks || []);
-    const [favorites, setFavorites] = useState(userFavorites.map(id => parseInt(id)) || []);
+     const [favorites, setFavorites] = useState(() => {
+        // Si userFavorites est défini et non vide, on le map pour en faire un tableau d'entiers
+        return Array.isArray(userFavorites) ? userFavorites.map(id => parseInt(id)) : []});
 
     const [filters, setFilters] = useState({
         searchQuery: '',
