@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\{Request, JsonResponse};
 use Illuminate\Support\Facades\Log;
-<<<<<<< HEAD
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -35,11 +34,7 @@ class BookController extends Controller{
             'books' => $books
         ]);
     }
-}
-=======
-
-class BookController extends Controller
-{
+    
     /**
      * Basculer l'état favori d'un livre
      */
@@ -54,4 +49,3 @@ class BookController extends Controller
         ]);
     }
 }
->>>>>>> bf8e38b (dernier modif)
