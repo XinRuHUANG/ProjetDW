@@ -45,7 +45,8 @@ class DatabaseSeeder extends Seeder
         // Appel aux autres seeders
         $this->call([
             BookSeeder::class,
-           
+            EquipmentSeeder::class, 
+            
         ]);
     }
 }
