@@ -19,13 +19,38 @@ Route::get('/', function () {
         ]);
 })->name('home');
 
+Route::get('/accueil', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+})->name('welcome.public');
+
 // Routes protégées (auth et email vérifié)
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // Routes pour les objets connectés et salles
-    Route::get('/objets-connectes', [ObjetConnecteController::class, 'index'])->name('objets.connectes');
+   // Favoris
+    Route::get('/favoris', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favoris/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::get('/api/favoris', function () {
+        $favorites = Auth::user()->favoriteBooks()->pluck('books.idBook');
+        return response()->json(['favorites' => $favorites]);
+    })->middleware('auth');
+ // Livres
+    Route::get('/livres', [BookController::class, 'index'])->name('books.index');
+  
+    // Dashboard spécifique membre
+    Route::get('/membre/dashboard', function () {
+        return Inertia::render('MemberDashboard');
+    })->name('member.dashboard');
+// Objets connectés
+    Route::get('/objets-connectes', [ConnectedDeviceController::class, 'index'])->name('devices.index');
+ // Salles
     Route::get('/salles', fn () => Inertia::render('Rooms/Index'))->name('salles.index');
-    Route::get('/livres', fn () => Inertia::render('Books/Index'))->name('livres.index');
+
 
     // Dashboard principal
     Route::get('/dashboard', function () {
@@ -38,10 +63,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Gestion des membres
-    Route::prefix('members')->group(function () {
+    Route::prefix('members')->middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [MemberController::class, 'index'])->name('members.index');
-        Route::get('/{user}', [MemberController::class, 'show'])->name('members.show');
-    });
+        Route::get('/{user}', [MemberController::class, 'show'])->name('members.show'); });
+    
 
     // Ressources pour les livres et appareils
     Route::resource('books', BookController::class)->except(['create', 'edit']);
