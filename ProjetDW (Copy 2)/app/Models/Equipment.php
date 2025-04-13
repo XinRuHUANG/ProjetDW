@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Equipment extends Model
 {
+
+    /**
+     * Nom de la table associée au modèle
+     * @var string
+     */
+    protected $table = 'equipment';
+    
     protected $primaryKey = 'id_equipment';
 
     protected $fillable = [

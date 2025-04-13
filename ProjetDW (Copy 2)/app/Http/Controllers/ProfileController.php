@@ -53,35 +53,40 @@ class ProfileController extends Controller
     }
     
         public function update(Request $request): RedirectResponse
-    {
-        $user = $request->user();
+{
+    // Validation des données envoyées
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|email|max:255|unique:users,email,' . $request->user()->id_user . ',id_user',
+        'birthday' => 'nullable|date',
+        'gender' => 'nullable|in:male,female,other',
+        'photo_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        $data = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
-            'photo_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'birthday' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
-            'points' => 'required|integer',
-        ]);
+    $user = $request->user();
 
-        if ($request->hasFile('photo_url')) {
-            // Supprimer l'ancienne photo si elle existe
-            if ($user->photo_url && Storage::exists('public/' . $user->photo_url)) {
-                Storage::delete('public/' . $user->photo_url);
-            }
-
-            // Sauvegarder la nouvelle
-            $data['photo_url'] = $request->file('photo_url')->store('profile-photos', 'public');
+    // Si une nouvelle photo est envoyée, on gère le téléchargement
+    if ($request->hasFile('photo_url')) {
+        // Supprimer l'ancienne photo si elle existe
+        if ($user->photo_url && Storage::exists('public/' . $user->photo_url)) {
+            Storage::delete('public/' . $user->photo_url);
         }
 
-        $user->update($data);
-        
-        $this->updateUserTypeBasedOnPoints($user);
-
-        return redirect()->route('profile.edit')->with('status', 'Profil mis à jour avec succès.');
+        // Sauvegarder la nouvelle photo
+        $validated['photo_url'] = $request->file('photo_url')->store('profile-photos', 'public');
     }
+
+    // Mettre à jour les informations de l'utilisateur
+    $user->update($validated);
+
+    // Mettre à jour le type d'utilisateur en fonction des points (si nécessaire)
+    //$this->updateUserTypeBasedOnPoints($user);
+
+    // Rediriger avec un message de succès
+    return back()->with('status', 'Profil mis à jour avec succès.');
+}
+
 
 }
 

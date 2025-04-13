@@ -1,193 +1,127 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
-
-const mockBooks = [
-    // Fiction
-    { 
-      id: 1, 
-      title: "Le Seigneur des Anneaux", 
-      author: "J.R.R. Tolkien", 
-      genre: "fantasy", 
-      year: 1954,
-      cover: "https://m.media-amazon.com/images/I/71jLBXtWJWL._AC_UF1000,1000_QL80_.jpg",
-      available: true,
-      rating: 4.8
-    },
-    { 
-      id: 2, 
-      title: "Harry Potter à l'école des sorciers", 
-      author: "J.K. Rowling", 
-      genre: "fantasy", 
-      year: 1997,
-      cover: "https://m.media-amazon.com/images/I/71-++hbbERL._AC_UF1000,1000_QL80_.jpg",
-      available: false,
-      rating: 4.7
-    },
-    // ... (keep all your other mock books)
-];
+import { Head, router, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 export default function BooksIndex() {
-    // State for favorites with localStorage persistence
+    const { books=[], categories=[] } = usePage().props;
+    
     const [favorites, setFavorites] = useState(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('libraryFavorites');
-            return saved ? JSON.parse(saved) : [];
-        }
-        return [];
+        const saved = localStorage.getItem('libraryFavorites');
+        return saved ? JSON.parse(saved) : [];
     });
 
-    // State for filters
     const [filters, setFilters] = useState({
         searchQuery: '',
+        year: '',
         genre: '',
-        availability: '',
-        minRating: 0
     });
 
-    // Save favorites to localStorage when they change
     useEffect(() => {
         localStorage.setItem('libraryFavorites', JSON.stringify(favorites));
     }, [favorites]);
 
-    // Toggle favorite status
-    const toggleFavorite = (bookId) => {
-        setFavorites(prev => 
-            prev.includes(bookId) 
-                ? prev.filter(id => id !== bookId) 
-                : [...prev, bookId]
-        );
+    const handleFavorite = (bookId) => {
+        router.post(route('favoris.store'), { id_book: bookId });
+        if (!favorites.includes(bookId)) setFavorites([...favorites, bookId]);
     };
 
-    // Filter books based on current filters
-    const filteredBooks = mockBooks.filter(book => {
-        const matchesSearch = filters.searchQuery === '' || 
-            book.title.toLowerCase().includes(filters.searchQuery.toLowerCase()) || 
+    const handleBorrow = (bookId) => {
+        router.post(route('borrow.store'), { id_book: bookId });
+    };
+
+    const filteredBooks = books.filter((book) => {
+        const matchSearch =
+            filters.searchQuery === '' ||
+            book.title.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
             book.author.toLowerCase().includes(filters.searchQuery.toLowerCase());
-        
-        const matchesGenre = filters.genre === '' || book.genre === filters.genre;
-        const matchesAvailability = filters.availability === '' || 
-            (filters.availability === 'available' && book.available) || 
-            (filters.availability === 'borrowed' && !book.available);
-        
-        const matchesRating = book.rating >= filters.minRating;
-        
-        return matchesSearch && matchesGenre && matchesAvailability && matchesRating;
+
+        const matchYear = filters.year === '' || book.year == filters.year;
+        const matchGenre = filters.genre === '' || book.category?.name === filters.genre;
+
+        return matchSearch && matchYear && matchGenre;
     });
 
+    const availableYears = [...new Set(books.map((book) => book.year))];
+    const availableGenres = [...new Set(categories.map((cat) => cat.name))];
+console.log('Books:', books);
+    console.log('Categories:', categories);
     return (
         <AuthenticatedLayout>
-            <Head title="Catalogue de Livres" />
-            
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <h1 className="text-2xl font-bold mb-6">Catalogue des Livres</h1>
-                            
-                            {/* Enhanced Filters */}
-                            <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
-                                {/* Search */}
-                                <input
-                                    type="text"
-                                    value={filters.searchQuery}
-                                    onChange={(e) => setFilters({...filters, searchQuery: e.target.value})}
-                                    placeholder="Titre, auteur..."
-                                    className="p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-                                />
-                                
-                                {/* Genre Filter */}
-                                <select
-                                    value={filters.genre}
-                                    onChange={(e) => setFilters({...filters, genre: e.target.value})}
-                                    className="p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-                                >
-                                    <option value="">Tous genres</option>
-                                    <option value="fantasy">Fantasy</option>
-                                    <option value="science-fiction">Science-Fiction</option>
-                                    <option value="thriller">Thriller</option>
-                                    <option value="classique">Classique</option>
-                                </select>
-                                
-                                {/* Availability Filter */}
-                                <select
-                                    value={filters.availability}
-                                    onChange={(e) => setFilters({...filters, availability: e.target.value})}
-                                    className="p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-                                >
-                                    <option value="">Tous</option>
-                                    <option value="available">Disponible</option>
-                                    <option value="borrowed">Emprunté</option>
-                                </select>
-                                
-                                {/* Rating Filter */}
-                                <select
-                                    value={filters.minRating}
-                                    onChange={(e) => setFilters({...filters, minRating: Number(e.target.value)})}
-                                    className="p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-                                >
-                                    <option value="0">Toutes notes</option>
-                                    <option value="4">4+ ⭐</option>
-                                    <option value="4.5">4.5+ ⭐</option>
-                                </select>
-                            </div>
-                            
-                            {/* Enhanced Books Grid */}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                                {filteredBooks.map(book => (
-                                    <div key={book.id} className="group relative">
-                                        {/* Favorite Button */}
-                                        <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                toggleFavorite(book.id);
-                                            }}
-                                            className={`absolute top-2 right-2 z-10 p-2 rounded-full ${
-                                                favorites.includes(book.id) 
-                                                    ? 'text-red-500 bg-white/90' 
-                                                    : 'text-gray-400 bg-white/70'
-                                            }`}
-                                        >
-                                            {favorites.includes(book.id) ? '❤️' : '🤍'}
-                                        </button>
-                                        
-                                        {/* Book Cover */}
-                                        <div className="aspect-[2/3] overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
-                                            <img
-                                                src={book.cover}
-                                                alt={book.title}
-                                                className="h-full w-full object-cover group-hover:opacity-90 transition-opacity"
-                                            />
-                                        </div>
-                                        
-                                        {/* Book Info */}
-                                        <div className="mt-3">
-                                            <h3 className="font-medium text-gray-900 dark:text-white">
-                                                {book.title}
-                                            </h3>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                {book.author}
-                                            </p>
-                                            <div className="mt-1 flex justify-between items-center">
-                                                <span className={`text-xs px-2 py-1 rounded ${
-                                                    book.available 
-                                                        ? 'bg-green-100 dark:bg-green-900' 
-                                                        : 'bg-yellow-100 dark:bg-yellow-900'
-                                                }`}>
-                                                    {book.available ? 'Disponible' : 'Emprunté'}
-                                                </span>
-                                                <span className="text-xs">
-                                                    {book.rating} ⭐
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+            <Head title="Catalogue des Livres" />
+
+            <div className="max-w-7xl mx-auto py-12 px-4">
+                <h1 className="text-3xl font-bold text-center mb-8">📚 Catalogue des Livres</h1>
+
+                {/* Filtres */}
+                <div className="mb-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <input
+                        type="text"
+                        placeholder="Recherche titre ou auteur..."
+                        className="border px-4 py-2 rounded w-full sm:w-64"
+                        value={filters.searchQuery}
+                        onChange={(e) => setFilters({ ...filters, searchQuery: e.target.value })}
+                    />
+                    <select
+                        value={filters.year}
+                        onChange={(e) => setFilters({ ...filters, year: e.target.value })}
+                        className="border px-4 py-2 rounded"
+                    >
+                        <option value="">Toutes années</option>
+                        {availableYears.map((year) => (
+                            <option key={year}>{year}</option>
+                        ))}
+                    </select>
+                    <select
+                        value={filters.genre}
+                        onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
+                        className="border px-4 py-2 rounded"
+                    >
+                        <option value="">Tous genres</option>
+                        {availableGenres.map((genre) => (
+                            <option key={genre}>{genre}</option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Affichage des livres */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {filteredBooks.map((book) => (
+                        <div key={book.id_book} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                            <img
+                                src={book.cover_image_url || '/default-book.jpg'}
+                                alt={book.title}
+                                className="w-full h-64 object-cover"
+                            />
+                            <div className="p-4">
+                                <h2 className="text-lg font-bold">{book.title}</h2>
+                                <p className="text-gray-600">{book.author}</p>
+                                <p className="text-sm text-gray-500">{book.year} — {book.category?.name}</p>
+
+                                <div className="mt-4 flex justify-between">
+                                    <button
+                                        onClick={() => handleFavorite(book.id_book)}
+                                        className={`px-3 py-1 text-sm rounded ${
+                                            favorites.includes(book.id_book)
+                                                ? 'bg-red-500 text-white'
+                                                : 'bg-gray-200 text-gray-700'
+                                        } hover:bg-red-600`}
+                                    >
+                                        ❤️ Favori
+                                    </button>
+                                    
+                                    <button
+                                        onClick={() => handleBorrow(book.id_book)}
+                                        className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                                    >
+                                        📚 Emprunter
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ))}
                 </div>
             </div>
         </AuthenticatedLayout>
     );
 }
+

@@ -18,14 +18,14 @@ class ProfileController extends Controller
     public function edit(Request $request): Response
     {
         $user = $request->user();
-
+dd($user);
         return Inertia::render('Profile/Edit', [
             'user' => [
                 'id'            => $user->id_user,
-                'first_name'    => $user->first_name,
+                'first_name'    => $user->firsjt_name,
                 'last_name'     => $user->last_name,
                 'age'           => $user->age,
-                'gender'        => $user->gender,
+                'gender'        => $user->gendjer,
                 'birthday'      => $user->birthday,
                 'email'         => $user->email,
                 'points'        => $user->points,
@@ -57,52 +57,41 @@ class ProfileController extends Controller
      * Mettre à jour les informations du profil de l'utilisateur
      */
     public function update(Request $request): RedirectResponse
-    {
-        $user = $request->user();
+{
+    // Validation des données envoyées
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|email|max:255|unique:users,email,' . $request->user()->id_user . ',id_user',
+        'birthday' => 'nullable|date',
+        'gender' => 'nullable|in:male,female,other',
+        'photo_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        // Validation des données envoyées
-        $data = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id_user . ',id_user',
-            'photo_url' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'birthday' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
-            'points' => 'required|integer',
-        ]);
+    $user = $request->user();
 
-        // Si une nouvelle photo de profil est téléchargée
-        if ($request->hasFile('photo_url')) {
-            // Supprimer l'ancienne photo si elle existe
-            if ($user->photo_url && Storage::exists('public/' . $user->photo_url)) {
-                Storage::delete('public/' . $user->photo_url);
-            }
-
-            // Sauvegarder la nouvelle photo
-            $data['photo_url'] = $request->file('photo_url')->store('profile-photos', 'public');
+    // Si une nouvelle photo est envoyée, on gère le téléchargement
+    if ($request->hasFile('photo_url')) {
+        // Supprimer l'ancienne photo si elle existe
+        if ($user->photo_url && Storage::exists('public/' . $user->photo_url)) {
+            Storage::delete('public/' . $user->photo_url);
         }
 
-        // Mise à jour des données de l'utilisateur
-        $user->update($data);
-        
-        // Mise à jour du type d'utilisateur en fonction des points (si nécessaire)
-        $this->updateUserTypeBasedOnPoints($user);
-
-        return redirect()->route('profile.edit')->with('status', 'Profil mis à jour avec succès.');
+        // Sauvegarder la nouvelle photo
+        $validated['photo_url'] = $request->file('photo_url')->store('profile-photos', 'public');
     }
 
-    /**
-     * Fonction pour mettre à jour le type d'utilisateur en fonction des points
-     */
-    private function updateUserTypeBasedOnPoints($user)
-    {
-        // Logique pour mettre à jour le type d'utilisateur selon ses points
-        if ($user->points >= 1000) {
-            $user->id_user_type = 2; // Exemple : utilisateur avec plus de 1000 points devient un type spécifique
-        } else {
-            $user->id_user_type = 1; // Type utilisateur de base
-        }
-        $user->save();
-    }
+    // Mettre à jour les informations de l'utilisateur
+    $user->update($validated);
+
+    // Mettre à jour le type d'utilisateur en fonction des points (si nécessaire)
+    //$this->updateUserTypeBasedOnPoints($user);
+
+    // Rediriger avec un message de succès
+    return back()->with('status', 'Profil mis à jour avec succès.');
+}
+
+
+
 }
 

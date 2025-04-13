@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Category;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Book extends Model
 {
@@ -43,9 +46,9 @@ class Book extends Model
      * Relation avec l'utilisateur qui a emprunté le livre
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function borrowedBy(): BelongsTo
+    public function books(): HasMany
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->hasMany(Book::class, 'user_id');
     }
 
     /**
@@ -65,7 +68,7 @@ class Book extends Model
      */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(BookCategory::class, 'id_category');
+        return $this->belongsTo(Category::class, 'id_category');
     }
 
     /**
@@ -76,4 +79,16 @@ class Book extends Model
     {
         return $this->status === 'Available' && $this->stock > 0;
     }
+    
+    public function favorites()
+{
+    return $this->belongsToMany(Book::class, 'favorites', 'id_user', 'id_book', 'id_user', 'id_book');
+}
+
+    public function borrowedBooks()
+{
+    return $this->hasMany(BorrowRecord::class, 'id_user', 'id_user');
+}
+
+
 }

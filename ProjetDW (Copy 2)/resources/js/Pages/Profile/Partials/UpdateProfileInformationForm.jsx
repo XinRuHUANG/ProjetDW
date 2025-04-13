@@ -12,7 +12,7 @@ export default function UpdateProfileInformation({
 }) {
     const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
+    const { data, setData, put, errors, processing, recentlySuccessful } =
         useForm({
         first_name: user.first_name || '',
         last_name: user.last_name || '',
@@ -26,7 +26,7 @@ export default function UpdateProfileInformation({
 
        const submit = (e) => {
         e.preventDefault();
-        patch(route('profile.update'));
+        put(route('profile.update'));
     };
 
     return (

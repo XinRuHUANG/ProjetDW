@@ -7,19 +7,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Favorite extends Model
 {
-    protected $primaryKey = 'idFavorite';
+    protected $primaryKey = 'id_favorite';
     protected $table = 'favorites';
     
-    protected $fillable = ['idUser', 'idBook'];
+    protected $fillable = ['id_user', 'id_book'];
     
-    public $timestamps = true;
+    public $timestamps = false;
     
     /**
      * Relation avec l'utilisateur
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'idUser');
+        return $this->belongsTo(User::class, 'id_user');
     }
     
     /**
@@ -27,6 +27,6 @@ class Favorite extends Model
      */
     public function book(): BelongsTo
     {
-        return $this->belongsTo(Book::class, 'idBook');
+        return $this->belongsTo(Book::class, 'id_book');
     }
 }

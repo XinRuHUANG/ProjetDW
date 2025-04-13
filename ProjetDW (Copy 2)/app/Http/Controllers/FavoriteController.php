@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\{Request, JsonResponse};
 use Illuminate\Support\Facades\Log;
+use App\Models\Favorite;
 
 class FavoriteController extends Controller
 {
@@ -58,4 +59,18 @@ class FavoriteController extends Controller
             ], 500);
         }
     }
+    
+    public function store(Request $request)
+{
+    $request->validate(['id_book' => 'required|exists:books,id_book']);
+
+    \App\Models\Favorite::firstOrCreate([
+        'id_user' => auth()->id(),
+        'id_book' => $request->id_book,
+    ]);
+
+    return back()->with('success', 'Ajouté aux favoris');
+}
+    
+    
 }

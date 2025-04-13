@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Book;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Favorite;
+use App\Models\BorrowRecord;
+use App\Models\EquipmentUsage;
+use App\Models\RoomReservation;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -58,63 +61,26 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
     * Relation many-to-many avec les livres favoris
     */
-    public function favoriteBooks(): BelongsToMany
+    public function favorites()
     {
-        return $this->belongsToMany(Book::class, 'favorites', 'id_user', 'idbook')
-                ->using(Favorite::class)
-                ->withTimestamps();
+        return $this->hasMany(Favorite::class, 'id_user', 'id_book');
     }
 
-    /**
-     * Relation avec les livres empruntés
-     */
-    public function borrowedBooks(): HasMany
+    public function emprunts()
     {
-        return $this->hasMany(Book::class, 'id_user');
+        return $this->hasMany(BorrowRecord::class , 'id_user', 'id_book');
     }
 
-    /**
-     * Relation avec les ordinateurs réservés
-     */
-    public function computers(): HasMany
+    public function usage()
     {
-        return $this->hasMany(Computer::class, 'id_user');
+        return $this->hasMany(EquipmentUsage::class, 'id_user', 'id_user');
     }
     
-        /**
-     * Calculer l'age à partir de la date de naissance
-     */
-    
-    protected $appends = ['age'];
-
-    public function getAgeAttribute()
+    public function reservations()
     {
-        return \Carbon\Carbon::parse($this->birthday)->age;
+        return $this->hasMany(RoomReservation::class);
     }
 
-    /**
-     * Relation avec les tablettes réservées
-     */
-    public function tablets(): HasMany
-    {
-        return $this->hasMany(Tablet::class, 'id_user');
-    }
-
-    /**
-     * Relation avec les sièges réservés
-     */
-    public function seats(): HasMany
-    {
-        return $this->hasMany(Seat::class, 'id_user');
-    }
-
-    /**
-     * Relation avec les salles réservées
-     */
-    public function rooms(): HasMany
-    {
-        return $this->hasMany(Room::class, 'id_user');
-    }
 
     /**
      * Vérifie si l'utilisateur est administrateur
@@ -129,7 +95,13 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function addPoints(int $points): void
     {
-        $this->points += $points;
-        $this->save();
+       $this->increment('points', $points);
     }
+    
+
+
+public function borrowedBooks()
+{
+    return $this->hasMany(BorrowRecord::class, 'id_user');
+}
 }

@@ -11,7 +11,7 @@ export default function AuthenticatedLayout({ children, header }) {
                     <div className="flex justify-between h-16 items-center">
                         <div className="flex space-x-4 items-center">
                             <Link href="/" className="text-lg font-bold text-gray-800">
-                                🏠 Dashboard
+                            ⬅ 🏠Acceuil
                             </Link>
                             <Link href={route('profile.edit')} className="text-gray-600 hover:text-gray-800">
                                 👤 Profil

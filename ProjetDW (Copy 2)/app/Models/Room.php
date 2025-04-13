@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Room extends Model
 {
+
+    /**
+     * Nom de la table associée au modèle
+     * @var string
+     */
+    protected $table = 'rooms';
+
     protected $primaryKey = 'id_room';
 
     protected $fillable = [

@@ -2,18 +2,21 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm,Link } from '@inertiajs/react';
 import React from 'react';
 
 export default function Edit({ auth, user }) {
 
 
     return (
-        <AuthenticatedLayout user={auth.user} header={<h2 className="text-xl font-bold text-gray-800">👤 Mon Profil</h2>}>
+        <AuthenticatedLayout user={auth.user} header={<h2 className="text-xl font-bold text-gray-800"><Link href={route('dashboard')} className="text-gray-600 hover:text-gray-800">
+                                        ↶Tableau de bord
+                                    </Link>     👤 Mon Profil</h2>}>
             <Head title="Profil" />
-
+                
+                
             <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow space-y-8 mt-10">
-
+                    
                 <div className="flex items-center gap-6">
                     {user.photo_url ? (
                         <img src={`/storage/profile-photos/${user.photo_url}`} alt="Photo de profil" className="w-24 h-24 rounded-full object-cover" />

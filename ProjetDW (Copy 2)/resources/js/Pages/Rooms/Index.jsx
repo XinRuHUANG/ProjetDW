@@ -1,93 +1,140 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 
+export default function RoomsIndex({ rooms, seats }) {
+    const [activeRoomId, setActiveRoomId] = useState(null);
+    const { data, setData, post, processing, errors, reset } = useForm({
+        id_room: '',
+        reservation_date: '',
+        start_time: '',
+        end_time: '',
+        purpose: '',
+        seats: [],
+    });
 
-const mockRooms = [
-  {
-    id: 1,
-    name: "Salle d'étude A",
-    description: "Salle calme pour 1-2 personnes, idéale pour la concentration",
-    capacity: 2,
-    equipment: ["prise électrique", "tableau blanc"]
-  },
-  {
-    id: 2,
-    name: "Salle de groupe B",
-    description: "Espace pour travail d'équipe (3-5 personnes)",
-    capacity: 5,
-    equipment: ["projecteur", "tableau blanc", "prises multiples"]
-  },
-  {
-    id: 3,
-    name: "Salle multimédia",
-    description: "Espace équipé d'ordinateurs pour 6 personnes",
-    capacity: 6,
-    equipment: ["6 PC", "projecteur", "tableau interactif"]
-  }
-];
+    const openForm = (roomId) => {
+        setActiveRoomId(prev => prev === roomId ? null : roomId);
+        setData({
+            id_room: roomId,
+            reservation_date: '',
+            start_time: '',
+            end_time: '',
+            purpose: '',
+            seats: [],
+        });
+    };
 
-export default function RoomsIndex() {
-  return (
-    <AuthenticatedLayout>
-      <Head title="Salles de la bibliothèque" />
-      
-      <div className="py-12">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-            <div className="p-6 text-gray-900 dark:text-gray-100">
-              <h1 className="text-2xl font-bold mb-6">Salles disponibles</h1>
-              
-              {/* Search and filters */}
-              <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Rechercher une salle..."
-                    className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
-                  />
+    const submit = (e) => {
+        e.preventDefault();
+        post(route('salles.reserver'), {
+            onSuccess: () => {
+                reset();
+                setActiveRoomId(null);
+            }
+        });
+    };
+
+    return (
+        <AuthenticatedLayout>
+            <Head title="Salles disponibles" />
+
+            <div className="max-w-6xl mx-auto py-10 px-6">
+                <h1 className="text-3xl font-bold mb-8 text-center">📚 Réservation de Salles</h1>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {rooms.map(room => (
+                        <div key={room.id_room} className="bg-white rounded-xl shadow p-6 relative">
+                            <h2 className="text-xl font-semibold mb-2">{room.room_name}</h2>
+                            <p><strong>Capacité :</strong> {room.capacity} personnes</p>
+                            <p><strong>Caractéristiques :</strong> {room.features}</p>
+
+                            <button
+                                onClick={() => openForm(room.id_room)}
+                                className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            >
+                                {activeRoomId === room.id_room ? 'Annuler' : 'Réserver'}
+                            </button>
+
+                            {activeRoomId === room.id_room && (
+                                <form onSubmit={submit} className="mt-6 space-y-4 border-t pt-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-sm">Date</label>
+                                            <input
+                                                type="date"
+                                                value={data.reservation_date}
+                                                onChange={(e) => setData('reservation_date', e.target.value)}
+                                                className="w-full border px-3 py-2 rounded"
+                                            />
+                                            {errors.reservation_date && <p className="text-red-500 text-sm">{errors.reservation_date}</p>}
+                                        </div>
+
+                                        <div>
+                                            <label className="text-sm">Objet</label>
+                                            <input
+                                                type="text"
+                                                value={data.purpose}
+                                                onChange={(e) => setData('purpose', e.target.value)}
+                                                className="w-full border px-3 py-2 rounded"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="text-sm">Heure de début</label>
+                                            <input
+                                                type="time"
+                                                value={data.start_time}
+                                                onChange={(e) => setData('start_time', e.target.value)}
+                                                className="w-full border px-3 py-2 rounded"
+                                            />
+                                            {errors.start_time && <p className="text-red-500 text-sm">{errors.start_time}</p>}
+                                        </div>
+
+                                        <div>
+                                            <label className="text-sm">Heure de fin</label>
+                                            <input
+                                                type="time"
+                                                value={data.end_time}
+                                                onChange={(e) => setData('end_time', e.target.value)}
+                                                className="w-full border px-3 py-2 rounded"
+                                            />
+                                            {errors.end_time && <p className="text-red-500 text-sm">{errors.end_time}</p>}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-sm">Choisir des sièges (optionnel)</label>
+                                        <select
+                                            multiple
+                                            value={data.seats}
+                                            onChange={(e) =>
+                                                setData('seats', Array.from(e.target.selectedOptions, option => option.value))
+                                            }
+                                            className="w-full border px-3 py-2 rounded"
+                                        >
+                                            {seats.map(seat => (
+                                                <option key={seat.id_seat} value={seat.id_seat}>
+                                                    {seat.seat_number} ({seat.zone})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                                        disabled={processing}
+                                    >
+                                        Valider la réservation
+                                    </button>
+                                </form>
+                            )}
+                        </div>
+                    ))}
                 </div>
-                
-                <div>
-                  <select className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
-                    <option value="">Toutes les capacités</option>
-                    <option value="1">1-2 personnes</option>
-                    <option value="2">3-5 personnes</option>
-                    <option value="3">6+ personnes</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <select className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
-                    <option value="">Tous les équipements</option>
-                    <option value="projector">Projecteur</option>
-                    <option value="whiteboard">Tableau blanc</option>
-                    <option value="computer">Ordinateur</option>
-                  </select>
-                </div>
-              </div>
-              
-              {/* Rooms list */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockRooms.map(room => (
-                  <div key={room.id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
-                    <h3 className="text-xl font-semibold mb-2">{room.name}</h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-3">{room.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Capacité: {room.capacity} personnes</span>
-                      <Link 
-                        href={`/salles/${room.id}`}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-                      >
-                        Réserver
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </AuthenticatedLayout>
-  );
+        </AuthenticatedLayout>
+    );
 }
+

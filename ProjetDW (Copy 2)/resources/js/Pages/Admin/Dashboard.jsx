@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
 import { useState } from 'react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 export default function Dashboard({ users }) {
     // States pour les entités
@@ -29,7 +30,25 @@ export default function Dashboard({ users }) {
     };
 
     return (
+    <AuthenticatedLayout>
         <div className="max-w-5xl mx-auto p-6">
+        <div className="flex justify-end mb-4">
+            <button
+                onClick={() => router.visit(route('admin.equipment.requests'))}
+                className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            >
+                📋 Voir les demandes d'utilisation d'équipements
+            </button>
+        </div>
+        
+        <div className="flex justify-end mb-4">
+        <button
+                onClick={() => router.visit(route('admin.rooms.requests'))}
+                className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            >
+                📋 Voir les demandes d'utilisation de salles
+            </button>
+        </div>
             <h1 className="text-3xl font-bold mb-8">Tableau de bord Admin</h1>
 
             {/* Gestion des utilisateurs */}
@@ -117,6 +136,7 @@ export default function Dashboard({ users }) {
                 </FormBlock>
             </section>
         </div>
+         </AuthenticatedLayout>
     );
 }
 
@@ -132,6 +152,7 @@ function FormBlock({ title, onSubmit, children }) {
                 </button>
             </form>
         </div>
+       
     );
 }
 
